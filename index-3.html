@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>좀비 바이러스가 퍼진다면? 당신의 24시간</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f4f1ec;--card:#fff;--ink:#1c1b19;--sub:#6b665e;--line:#dcd6cb;--acc:#b3261e;--accb:#fbe9e7;--ok:#1b7a43;--warn:#b7791f}
+:root[data-theme="dark"]{--bg:#111312;--card:#1b1e1c;--ink:#ece9e2;--sub:#9a968c;--line:#2f332f;--acc:#ff6b5e;--accb:#2c1a18;--ok:#5fd18a;--warn:#e0b25a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111312;--card:#1b1e1c;--ink:#ece9e2;--sub:#9a968c;--line:#2f332f;--acc:#ff6b5e;--accb:#2c1a18;--ok:#5fd18a;--warn:#e0b25a}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.65}
+main{max-width:560px;margin:0 auto;padding:20px 16px 48px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+h1{font-size:24px;line-height:1.3;margin:0 0 10px}
+h2{font-size:18px;margin:0 0 6px}
+.sub{color:var(--sub);font-size:14px}
+.tag{display:inline-block;font-size:12px;font-weight:700;color:var(--acc);background:var(--accb);padding:3px 10px;border-radius:99px;margin-bottom:10px}
+.news{border-left:4px solid var(--acc);background:var(--accb);padding:10px 14px;margin:14px 0;border-radius:6px;font-size:15px}
+.bar{height:6px;background:var(--line);border-radius:9px;margin-bottom:14px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);transition:width .4s}
+button{font:inherit;color:inherit;cursor:pointer}
+.opt{display:block;width:100%;text-align:left;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:14px;margin-top:10px;font-size:15px;transition:.15s}
+.opt:hover,.opt:active{border-color:var(--acc)}
+.opt b{color:var(--acc);margin-right:6px}
+.go{display:block;width:100%;margin-top:18px;background:var(--acc);color:#fff;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:700}
+a.go{text-decoration:none;text-align:center}
+.must{border:3px solid var(--acc);background:var(--accb);border-radius:14px;padding:18px 14px;margin:18px 0;text-align:center}
+.must .big{font-size:22px;font-weight:800;color:var(--acc);line-height:1.35}
+.must p{font-size:15px;margin:10px 0 4px}
+.must .go{font-size:18px;padding:16px}
+.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.fade{animation:f .35s ease}
+@keyframes f{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.score{font-size:48px;font-weight:800;color:var(--acc);line-height:1}
+.rev{border-top:1px solid var(--line);padding:12px 0;font-size:14px}
+.rev .l{font-size:12px;font-weight:700}
+.g{color:var(--ok)}.m{color:var(--warn)}.r{color:var(--acc)}
+.code{font-family:ui-monospace,Menlo,monospace;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:10px;text-align:center;font-size:17px;letter-spacing:1px}
+details{margin-top:22px}summary{cursor:pointer;color:var(--sub);font-size:13px}
+textarea{width:100%;min-height:90px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:13px;margin-top:8px}
+.row{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:3px 0}
+.row span:first-child{width:92px;flex:none}.row .tr{flex:1;height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.row .tr i{display:block;height:100%}
+small{color:var(--sub)}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+// 선택지: [코드, 문장, 점수, 해설 라벨, 방역 원칙]
+const T = {
+ s1:{A:"SNS와 단톡방에서 빠르게 정보를 모은다",B:"질병관리청·재난문자 등 공식 발표를 확인한다",C:"일단 가족에게 전화부터 한다"},
+};
+const S = [
+ {tag:"17:00 · 정보", intro:()=>"SNS에는 “가짜뉴스다”, “우리 동네에도 있다”는 글이 섞여 올라온다. 가온이가 묻는다. “이거 진짜야?”",
+  o:[["A","SNS와 단톡방에서 빠르게 정보를 모은다",0,"인포데믹 노출","검증되지 않은 정보는 빠르게 퍼집니다. 코로나19 때 WHO도 ‘인포데믹’을 경고했습니다."],
+     ["B","질병관리청·재난문자 등 공식 발표를 확인한다",2,"공식 정보 확인","위기 소통의 기본은 공식 채널 확인입니다."],
+     ["C","일단 가족에게 전화부터 한다",1,"정서 우선 대응","가족 안전 확인은 자연스럽지만, 행동 전에 정보 확인이 먼저입니다."]]},
+ {tag:"18:00 · 이동", intro:s=>({A:"SNS에는 “대피소가 안전하다”와 “집도 위험하다”는 글이 뒤섞여 있다. ",B:"재난문자가 온다. “실내 대기, 불필요한 이동 자제.” ",C:"가족은 전화를 받지 않는다. "}[s[0]])+"학교 근처에 감염자가 나타났다. 당장 움직여야 한다.",
+  o:[["A","사람이 모이는 대피소로 간다",1,"시설 집결","보호는 받지만 밀집 시설은 집단감염 위험이 있습니다."],
+     ["B","멀리 있는 가족에게 위험을 무릅쓰고 이동한다",0,"이동 중 노출 증가","이동은 접촉 기회와 확산 경로를 늘립니다."],
+     ["C","가까운 집으로 가서 문을 잠그고 버틴다",2,"자가격리","접촉을 최소화하는 가장 기본적인 방역 행동입니다."]]},
+ {tag:"20:00 · 가온이가 물렸다", intro:s=>({A:"대피소 입구에서",B:"가족에게 가는 길목에서",C:"집 현관 앞에서"}[s[1]])+" 감염자가 갑자기 나타나 <b>가온이를 콱 물었다.</b> 가온이가 웃으며 말한다. “나 진짜 안 물렸어, 믿어줘!” 이빨자국도 없는 것 같고, 증상도 없다.",
+  o:[["A","혹시 모르니 씻기고, 24시간 별도 공간에서 지켜본다",2,"응급처치 + 잠복기 격리","상처 세척과 잠복기 동안의 격리 관찰은 접촉자 관리의 원칙입니다."],
+     ["B","가온이를 믿고 그대로 함께 움직인다",0,"무증상 감염자 동행","잠복기 감염자는 겉으로 구분이 안 되어 무증상 전파가 일어납니다."],
+     ["C","안타깝지만 혼자 떠난다",1,"접촉자 방치","본인은 안전하지만 접촉자 추적이 끊기고 윤리적 쟁점이 남습니다."]],
+  ask:"방금 그렇게 선택한 이유를 한 줄로 적어주세요. (선택)"},
+ {tag:"02:00 · 결과", intro:s=>({A:"가온이의 열이 오르고 있다. 아직 확실하지는 않다.",B:"가온이가 고열에 공격성을 보이기 시작한다. 주변 사람들도 위험하다.",C:"하지만 결국 마음이 약해져 가온이와 함께 왔다."}[s[2]])+"<br><br>머릿속에서 목소리가 맴돈다. “감염자를 신고하면 그곳에서 어떻게 될지 모른다. 잡혀가면 죽을지도 몰라. 그냥 기다리면 괜찮아지지 않을까?”",
+  o:[["A","우리끼리 해결하려고 한다 (증상을 숨기거나 직접 처리)",0,"보고 지연·은폐","증상 은폐와 신고 지연은 접촉자 추적 실패로 이어집니다."],
+     ["B","상황이 악화되기 전에 그 자리를 떠난다",1,"이탈","감염 가능 경로를 알리지 않고 떠나면 확산 위험이 남습니다."],
+     ["C","가온이의 상태를 구조대·방역 당국에 정확히 알리고 도움을 요청한다",2,"신고·역학조사 협조","정확한 신고가 역학조사와 접촉자 격리의 출발점입니다."]]},
+ {tag:"다음 날 오전 · 결말", intro:s=>({A:"밤새 가온이는 의식을 잃어갔다. ",B:"걷고 또 걷다 아침이 밝았다. ",C:"구조대가 가온이를 데려갔다. "}[{A:"A",B:"B",C:"C"}[s[3]==="C"?"C":s[3]==="B"?"B":"A"]])+"방송이 나온다. “백신 개발에는 최소 1년 이상 소요됩니다. 통제구역에서 검사와 보호를 제공합니다.”<br><br>하지만 어디선가 소문이 들린다. “감염자와 접촉한 사실을 들키면 잡혀간대. 감염자랑 같은 취급을 받을지도 몰라.”",
+  o:[["A","검사는 피하고 안전한 외곽에서 따로 지낸다",0,"검사 회피","접촉 사실을 숨기면 잠복기 감염자가 사회에 남습니다."],
+     ["B","통제구역으로 가서 가온이와의 접촉 사실을 알리고 검사를 받는다",2,"검사·추적 협조","공적 방역 체계를 이용해야 조기 발견과 치료·차단이 가능합니다."],
+     ["C","상황이 정리될 때까지 지금 장소에서 버틴다",1,"현 상태 유지","안전할 수 있으나 접촉 이력 확인 없이 장기 대응이 어렵습니다."]]}
+];
+const ENDS=[[10,"최후의 생존자","인류 멸망 후에도 혼자 살아남을 사람. 좀비가 당신을 피해 다닙니다."],
+ [9,"인류의 희망","당신이 있는 한 인류는 쉽게 멸망하지 않습니다."],
+ [8,"생존 전문가","위기 상황에서도 침착하게 살아남을 인재입니다."],
+ [7,"좀비 헌터 지망생","제법 쓸 만합니다. 아직은 지망생이지만요."],
+ [6,"예비 생존자","아직 희망은 있습니다. 도망치는 법부터 배웁시다."],
+ [5,"일반 시민 A","평균적인 생존 능력. 딱 엑스트라 1입니다."],
+ [4,"운빨 생존자","실력은 모르겠고 운이 당신을 살렸습니다."],
+ [3,"튜토리얼 탈락자","좀비 사태는 처음이시죠? 네, 티가 납니다."],
+ [2,"걸어 다니는 감염원","생존 계획보다 감염 계획이 더 완벽하군요."],
+ [0,"최초의 희생자","좀비보다 상황 파악이 먼저 필요합니다."]];
+
+const FORM="https://docs.google.com/forms/d/e/1FAIpQLSdORxCPkAtbnysQ8fEiYUGC7mdIkzXy7ziNLbG5_buIu8kPTw/viewform?usp=pp_url&entry.500411084="; // 구글 폼 미리 채워진 링크(…entry.123456=)를 넣으면 제출 버튼이 나타남
+const app=document.getElementById("app");
+let st=[],i=0;
+const h=s=>{app.innerHTML=s;window.scrollTo(0,0)};
+
+function start(){
+ st=[];i=0;window._why="";
+ h(`<div class="card fade"><span class="tag">탐구 활동 · 약 2분</span>
+ <h1>좀비 바이러스 발생 D-DAY.<br>당신은 살아남을 수 있을까?</h1>
+ <p class="sub">좀비 바이러스가 현실이 된다면 당신은 어떤 선택을 할까요?<br>지금부터 당신의 생존 본능을 확인해 보세요.</p>
+ <div class="news"><b>📺 [긴급 뉴스 속보]</b><br>정체불명의 바이러스가 확산되며 감염자들이 비정상적인 행동을 보이고 있습니다. 당국은 해당 바이러스의 정체를 조사 중이며, 시민들에게 각별한 주의를 당부했습니다.</div>
+ <p>방과후를 짼 상쾌한 5시 하교 직후, 당신은 친구 <b>가온</b>이와 <b>따봉떡볶이</b>를 먹으러 가고 있다!</p>
+ <div class="news"><b>📝 부탁 한 가지!</b><br>게임이 끝나면 마지막 화면의 <b>“설문 제출하기”</b> 버튼을 눌러 결과를 꼭 설문에 작성해 주세요.</div>
+ <button class="go" onclick="scene()">시작하기</button>
+ <details><summary>🔧 응답 집계 (설문 만든 사람용)</summary>
+ <p class="sub">친구들이 보내준 결과 코드(예: B-C-A-C-B)를 한 줄에 하나씩 붙여넣으면 장면별 비율이 계산돼요.</p>
+ <textarea id="codes" placeholder="B-C-A-C-B&#10;A-B-C-A-A"></textarea>
+ <button class="go ghost" onclick="tally()">집계하기</button><div id="tally"></div></details></div>`);
+}
+
+function scene(){
+ const sc=S[i];
+ h(`<div class="bar"><i style="width:${i/S.length*100}%"></i></div>
+ <div class="card fade"><span class="tag">장면 ${i+1} / ${S.length} · ${sc.tag}</span>
+ <p style="font-size:16px">${sc.intro(st)}</p>
+ <h2>당신은?</h2>
+ ${sc.o.map(o=>`<button class="opt" onclick="pick('${o[0]}')"><b>${o[0]}</b>${o[1]}</button>`).join("")}
+ ${sc.ask?`<textarea id="why" placeholder="${sc.ask}"></textarea>`:""}</div>`);
+}
+function pick(c){
+ const w=document.getElementById("why");
+ if(w&&w.value.trim())window._why=w.value.trim();
+ st.push(c);i++;
+ i<S.length?scene():end();
+}
+function end(){
+ let tot=0;const rows=st.map((c,k)=>{const o=S[k].o.find(x=>x[0]===c);tot+=o[2];
+  const cl=o[2]==2?"g":o[2]==1?"m":"r",lb=o[2]==2?"적절":o[2]==1?"부분 적절":"위험";
+  return `<div class="rev"><div class="l ${cl}">장면 ${k+1} · ${lb} · ${o[3]}</div>${o[1]}<br><small>${o[4]}</small></div>`}).join("");
+ const e=ENDS.find(x=>tot>=x[0]);const why=(window._why||"").replace(/[\n\r'"\\<>$`]/g," ").slice(0,120);const code=st.join("-")+(why?" | "+why:"");
+ h(`<div class="bar"><i style="width:100%"></i></div><div class="card fade">
+ <span class="tag">결과</span><h1>${e[1]}</h1>
+ <p class="sub" style="margin:4px 0 0">나의 생존률</p><div class="score">⭐ ${tot}<span class="sub" style="font-size:20px"> / 10</span></div>
+ <p>${e[2]}</p>
+ 
+ <div class="news" style="margin-top:16px"><b>💡 실제 감염병 대응과 연결하면</b><br>정보 확인 → 이동 제한 → 접촉자 관리 → 신고·역학조사 → 검사·치료. 이 다섯 단계에서 시민의 협조가 얼마나 이어지느냐가 실제 감염병 대응의 성패를 좌우합니다.</div>
+ <div class="must"><div class="big">📝 마지막 단계!<br>결과를 꼭 설문에 작성해 주세요</div><p>(개발자의 미숙으로 자동으로 데이터 전송되는 시스템 만들기에 실패했습니다 ㅠㅠ<br><b>설문 버튼만 누르면 바로 입력되니 3초만 부탁드립니다!</b>)</p>${FORM?`<a class="go" target="_blank" rel="noopener" href="${FORM}${encodeURIComponent(code)}">👉 설문 제출하기 (3초)</a>`:""}</div>
+ <p style="margin-top:16px"><b>내 결과 코드</b> <small>(복사해서 단톡방·DM으로 보내주세요)</small></p>
+ <div class="code" id="cd">${code}</div>
+ <button class="go" id="cpb" onclick="cp('${code}')">결과 코드 복사하기</button>
+ <button class="go ghost" onclick="start()">다시 하기</button>
+ <p class="sub" style="margin-top:14px">※ 가상의 상황을 가정한 사고 실험이며, 점수는 방역 원칙(공식 정보 확인, 접촉 최소화, 접촉자 관리, 신고·검사 협조)에 따른 것입니다.</p></div>`);
+}
+function cp(c){
+ const b=document.getElementById("cpb");
+ const ok=()=>{b.textContent="복사됨 ✓"};
+ try{navigator.clipboard.writeText(c).then(ok,()=>sel())}catch(e){sel()}
+ function sel(){const r=document.createRange();r.selectNodeContents(document.getElementById("cd"));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="코드를 길게 눌러 복사하세요"}
+}
+function tally(){
+ const m=(document.getElementById("codes").value.match(/[ABC]-[ABC]-[ABC]-[ABC]-[ABC]/g)||[]).map(x=>x.split("-"));
+ const el=document.getElementById("tally");
+ if(!m.length){el.innerHTML="<p class='sub'>인식된 코드가 없어요.</p>";return}
+ let sum=0,out=`<p><b>응답 ${m.length}명</b></p>`;
+ m.forEach(r=>r.forEach((c,k)=>sum+=S[k].o.find(x=>x[0]===c)[2]));
+ out+=`<p>평균 방역 대응 점수: <b>${(sum/m.length).toFixed(1)} / 10</b></p>`;
+ S.forEach((sc,k)=>{
+  out+=`<p style="margin:12px 0 2px"><b>장면 ${k+1}</b> <small>${sc.tag}</small></p>`;
+  sc.o.forEach(o=>{const n=m.filter(r=>r[k]===o[0]).length,p=Math.round(n/m.length*100);
+   const col=o[2]==2?"var(--ok)":o[2]==1?"var(--warn)":"var(--acc)";
+   out+=`<div class="row"><span>${o[0]}. ${o[3]}</span><span class="tr"><i style="width:${p}%;background:${col}"></i></span><span>${p}% (${n})</span></div>`});
+  const risk=Math.round(m.filter(r=>S[k].o.find(x=>x[0]===r[k])[2]==0).length/m.length*100);
+  out+=`<small>위험 선택 ${risk}%</small>`;
+ });
+ const rs=document.getElementById("codes").value.split("\n").filter(l=>/[ABC]-[ABC]-[ABC]-[ABC]-[ABC]/.test(l)&&l.includes("|")).map(l=>l.split("|").slice(1).join("|").trim()).filter(Boolean);
+ if(rs.length)out+=`<p style="margin:16px 0 4px"><b>장면 3 선택 이유 (${rs.length}건)</b></p>`+rs.map(r=>`<div class="rev">${r}</div>`).join("");
+ el.innerHTML=out;
+}
+start();
+</script>
+</body>
+</html>
